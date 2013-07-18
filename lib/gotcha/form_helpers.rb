@@ -4,11 +4,30 @@ module Gotcha
 
     # Propose a gotcha to the user - question and answer hash
     def gotcha(options = {})
-      options[:label_options] ||= {}
+      options[:label_options] ||= {class:"gotcha required control-label"}
+      form = options[:form] or raise "please pass the form object"
       options[:text_field_options] ||= {}
       if gotcha = Gotcha.random
         field = "gotcha_response[#{gotcha.class.name.to_s}-#{Digest::MD5.hexdigest(gotcha.class.down_transform(gotcha.answer))}]"
-        (label_tag field, gotcha.question, options[:label_options]) + "\n" + (text_field_tag field, nil, options[:text_field_options])
+
+        simple_form = []
+        simple_form << form.label(field, gotcha.question, options[:label_options])
+
+        simple_form << content_tag(:span, class: "bubble", :data => {'original-title' => options[:tooltip]}) do
+          content_tag(:i, '', class: "icon-question-sign")
+        end if options[:tooltip]
+
+        simple_form << content_tag(:div, class: 'controls') do
+          concat text_field_tag(field, nil, options[:text_field_options])
+          concat content_tag(:span, gotcha_error, class: "help-inline")
+        end
+
+        simple_form << form.hint('No special characters, please!') if options[:hint]
+        simple_form << form.error(:username, id: 'user_name_error') if gotcha_error
+
+        content_tag :div, class: "control-group string required gotcha #{ @_gotcha_validated === false ? 'error' : ''}" do
+          simple_form.join('').html_safe
+        end
       else
         raise "No Gotchas Installed"
       end
@@ -16,7 +35,7 @@ module Gotcha
 
     # Return the gotcha error if its needed
     def gotcha_error
-      t(:gotcha_validation_failed, :default => 'Failed to validate the Gotcha.') if @_gotcha_validated === false
+      t('gotcha.error_message', :default => 'Failed to validate the Gotcha.') if @_gotcha_validated === false
     end
 
   end
