@@ -51,6 +51,16 @@ A random Gotcha type will be generated on each call to `gotcha`
       end
     end
 
+### Add translations
+
+bg:
+  gotcha:
+    error_message: Грешен отговор
+    sum_gotcha:
+      question1: "Колко е %{rand1} + %{rand2}?"
+      question2: "%{rand1} + %{rand2} ?"
+      question3: "%{rand1} плюс %{rand2} = ?"
+
 ---
 
 ## Multiple Gotchas in a page?
