@@ -38,49 +38,44 @@ module Gotcha
       t('gotcha.error_message', :default => 'Failed to validate the Gotcha.') if @_gotcha_validated === false
     end
 
-  end
-
-
-  # gotcha with bootstrap3 markup
-  def bootstap3_gotcha(options = {})
-    options[:label_options] ||= {}
-    options[:text_field_options] ||= {}
-
-    horizontal = options[:horizontal] ||= false
-
-    if gotcha = Gotcha.random
-      field = "gotcha_response[#{gotcha.class.name.to_s}-#{Digest::MD5.hexdigest(gotcha.class.down_transform(gotcha.answer))}]"
-      content_tag :div, class: "form-group #{@_gotcha_validated === false ? 'has-error' : ''}" do
-        tooltip = build_tooltip options[:tooltip]
-        content = label_tag(field, gotcha.question, options[:label_options].merge(class: "#{horizontal ? 'control-label col-lg-4' : ''}"))
-        content = "#{content}#{tooltip}"
-
-        input = text_field_tag(field, nil, options[:text_field_options].merge(class: 'form-control gotcha captcha'))
-        error = build_error options[:error_message]
-
-        content = content + content_tag(:div, input + error, class: "#{horizontal ? 'col-lg-8' : ''}")
-        content.html_safe
-      end
-    else
-      raise "No Gotchas Installed"
-    end
-  end
-
-  private
-  def build_tooltip tooltip_content
-    if tooltip_content
-      content_tag(:span, :class => 'bubble', :"data-original-title" => tooltip_content) do
-        content_tag(:span, '', :class => 'glyphicon glyphicon-question-sign')
+    # gotcha with bootstrap3 markup
+    def bootstap3_gotcha(options = {})
+      options[:label_options] ||= {}
+      options[:text_field_options] ||= {}
+      horizontal = options[:horizontal] ||= false
+      if gotcha = Gotcha.random
+        field = "gotcha_response[#{gotcha.class.name.to_s}-#{Digest::MD5.hexdigest(gotcha.class.down_transform(gotcha.answer))}]"
+        content_tag :div, class: "form-group #{@_gotcha_validated === false ? 'has-error' : ''}" do
+          tooltip = build_tooltip options[:tooltip]
+          content = label_tag(field, gotcha.question, options[:label_options].merge(class: "#{horizontal ? 'control-label col-lg-4' : ''}"))
+          content = "#{content}#{tooltip}"
+          input = text_field_tag(field, nil, options[:text_field_options].merge(class: 'form-control gotcha captcha'))
+          error = build_error options[:error_message]
+          content = content + content_tag(:div, input + error, class: "#{horizontal ? 'col-lg-8' : ''}")
+          content.html_safe
+        end
+      else
+        raise "No Gotchas Installed"
       end
     end
-  end
 
-  def build_error error_message
-    if @_gotcha_validated === false
-      content_tag(:span, class: 'help-block') do
-        error_message
+    private
+    def build_tooltip tooltip_content
+      if tooltip_content
+        content_tag(:span, :class => 'bubble', :"data-original-title" => tooltip_content) do
+          content_tag(:span, '', :class => 'glyphicon glyphicon-question-sign')
+        end
       end
     end
+
+    def build_error error_message
+      if @_gotcha_validated === false
+        content_tag(:span, class: 'help-block') do
+          error_message
+        end
+      end
+    end
+
   end
 
 end
